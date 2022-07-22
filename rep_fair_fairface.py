@@ -7,21 +7,39 @@ Original file is located at
     https://colab.research.google.com/drive/1FFII0_3jY1DYHragJVawvyjb00bGn5RJ
 """
 
+!pip install tensorflow-gpu==2.3.0
+
+# from google.colab import drive
+# drive.mount('/content/gdrive')
+
+#!unzip "/content/gdrive/MyDrive/Updated research/Fair-Face/fairface-img-margin025-trainval.zip"
+
 import pandas as pd
+import matplotlib.pyplot as plt
+import matplotlib.image as mpimg
 import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import layers
+import numpy as np
+import os
+import gdown
+from zipfile import ZipFile
 
-#setting the training and testing datasets
-tarin_df = pd.read_csv("fairface_label_train.csv")
+# tarin_df = pd.read_csv("/content/gdrive/MyDrive/Updated research/Fair-Face/fairface_label_train.csv")
+# val_df = pd.read_csv("/content/gdrive/MyDrive/Updated research/Fair-Face/fairface_label_val.csv")
 
-#preprocessing the images
+# tarin_df
+
+# img = mpimg.imread(f"{tarin_df['file'][86743]}")
+# plt.imshow(img)
+
+# img.shape
+
 dataset = keras.preprocessing.image_dataset_from_directory(
-    "Fair-Face/train/", label_mode=None, image_size=(224, 224), batch_size=2
+    "/content/train_files", label_mode=None, image_size=(224, 224), batch_size=256
 )
 dataset = dataset.map(lambda x: x / 255.0)
 
-#Discriminator model
 discriminator = keras.Sequential(
     [
         keras.Input(shape=(224, 224, 3)),
@@ -37,10 +55,10 @@ discriminator = keras.Sequential(
     ],
     name="discriminator",
 )
+discriminator.summary()
 
-
-#Generator model
 latent_dim = 448
+
 generator = keras.Sequential(
     [
         keras.Input(shape=(latent_dim,)),
@@ -56,8 +74,8 @@ generator = keras.Sequential(
     ],
     name="generator",
 )
+generator.summary()
 
-#the Gan Model
 class GAN(keras.Model):
     def __init__(self, discriminator, generator, latent_dim):
         super(GAN, self).__init__()
@@ -116,12 +134,14 @@ class GAN(keras.Model):
         with tf.GradientTape() as tape:
             predictions = self.discriminator(self.generator(random_latent_vectors))
             g_loss = self.loss_fn(misleading_labels, predictions)
-        grads = tape.gradient(g_loss, self.generator.nable_weights)
+        grads = tape.gradient(g_loss, self.generator.trainable_weights)
         self.g_optimizer.apply_gradients(zip(grads, self.generator.trainable_weights))
 
         # Update metrics
         self.d_loss_metric.update_state(d_loss)
         self.g_loss_metric.update_state(g_loss)
+        self.generator.save("Generator_model")
+        self.discriminator.save("Discriminator_model")
         return {
             "d_loss": self.d_loss_metric.result(),
             "g_loss": self.g_loss_metric.result(),
@@ -137,9 +157,6 @@ class GANMonitor(keras.callbacks.Callback):
         generated_images = self.model.generator(random_latent_vectors)
         generated_images *= 255
         generated_images.numpy()
-        if epoch % 5 == 0:
-            gan.generator.save("Generator_model")
-            gan.discriminator.save("Discriminator_model")
         for i in range(self.num_img):
             img = keras.preprocessing.image.array_to_img(generated_images[i])
             img.save("generated_img_%03d_%d.png" % (epoch, i))
@@ -157,5 +174,5 @@ gan.fit(
     dataset, epochs=epochs, callbacks=[GANMonitor(num_img=10, latent_dim=latent_dim)]
 )
 
-gan.generator.save("Final_Generator_model")
-gan.discriminator.save("Final_Discriminator_model")
+gan.generator.save("Generator_model")
+gan.discriminator.save("Discriminator_model")
