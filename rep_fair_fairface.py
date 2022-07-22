@@ -7,13 +7,6 @@ Original file is located at
     https://colab.research.google.com/drive/1FFII0_3jY1DYHragJVawvyjb00bGn5RJ
 """
 
-!pip install tensorflow-gpu==2.3.0
-
-# from google.colab import drive
-# drive.mount('/content/gdrive')
-
-#!unzip "/content/gdrive/MyDrive/Updated research/Fair-Face/fairface-img-margin025-trainval.zip"
-
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
@@ -25,15 +18,6 @@ import os
 import gdown
 from zipfile import ZipFile
 
-# tarin_df = pd.read_csv("/content/gdrive/MyDrive/Updated research/Fair-Face/fairface_label_train.csv")
-# val_df = pd.read_csv("/content/gdrive/MyDrive/Updated research/Fair-Face/fairface_label_val.csv")
-
-# tarin_df
-
-# img = mpimg.imread(f"{tarin_df['file'][86743]}")
-# plt.imshow(img)
-
-# img.shape
 
 dataset = keras.preprocessing.image_dataset_from_directory(
     "/content/train_files", label_mode=None, image_size=(224, 224), batch_size=256
