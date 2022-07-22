@@ -20,7 +20,7 @@ from zipfile import ZipFile
 
 
 dataset = keras.preprocessing.image_dataset_from_directory(
-    "/content/train_files", label_mode=None, image_size=(224, 224), batch_size=256
+    "/dataset/train_files", label_mode=None, image_size=(224, 224), batch_size=256
 )
 dataset = dataset.map(lambda x: x / 255.0)
 
