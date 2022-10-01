@@ -86,7 +86,7 @@ class GAN(keras.Model):
             predictions = self.discriminator(combined_images)
             d_loss = self.loss_fn(labels, predictions)
         grads = tape.gradient(d_loss, self.discriminator.trainable_weights)
-        #grads = [(tf.clip_by_norm(grad, clip_norm=2.0)) for grad in grads]
+        grads = [(tf.clip_by_norm(grad, clip_norm=2.0)) for grad in grads]
         self.d_optimizer.apply_gradients(
             zip(grads, self.discriminator.trainable_weights)
         )
