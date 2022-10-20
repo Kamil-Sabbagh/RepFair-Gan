@@ -4,18 +4,18 @@ from tensorflow.keras import layers
 
 
 dataset = keras.preprocessing.image_dataset_from_directory(
-    "dataset/train/", label_mode=None, image_size=(224, 224), batch_size=1
+    "dataset/train/", label_mode=None, image_size=(64, 64), batch_size=1
 )
 dataset = dataset.map(lambda x: x / 255.0)
 
 discriminator = keras.Sequential(
     [
-        keras.Input(shape=(224, 224, 3)),
-        layers.Conv2D(224, kernel_size=4, strides=2, padding="same"),
+        keras.Input(shape=(64, 64, 3)),
+        layers.Conv2D(64, kernel_size=4, strides=2, padding="same"),
         layers.LeakyReLU(alpha=0.2),
-        layers.Conv2D(448, kernel_size=4, strides=2, padding="same"),
+        layers.Conv2D(128, kernel_size=4, strides=2, padding="same"),
         layers.LeakyReLU(alpha=0.2),
-        layers.Conv2D(448, kernel_size=4, strides=2, padding="same"),
+        layers.Conv2D(128, kernel_size=4, strides=2, padding="same"),
         layers.LeakyReLU(alpha=0.2),
         layers.Flatten(),
         layers.Dropout(0.2),
@@ -25,18 +25,18 @@ discriminator = keras.Sequential(
 )
 discriminator.summary()
 
-latent_dim = 448
+latent_dim = 128
 
 generator = keras.Sequential(
     [
         keras.Input(shape=(latent_dim,)),
-        layers.Dense(28 * 28 * 448),
-        layers.Reshape((28, 28, 448)),
-        layers.Conv2DTranspose(448, kernel_size=4, strides=2, padding="same"),
+        layers.Dense(28 * 28 * 128),
+        layers.Reshape((28, 28, 128)),
+        layers.Conv2DTranspose(128, kernel_size=4, strides=2, padding="same"),
         layers.LeakyReLU(alpha=0.2),
-        layers.Conv2DTranspose(896, kernel_size=4, strides=2, padding="same"),
+        layers.Conv2DTranspose(256, kernel_size=4, strides=2, padding="same"),
         layers.LeakyReLU(alpha=0.2),
-        layers.Conv2DTranspose(1792, kernel_size=4, strides=2, padding="same"),
+        layers.Conv2DTranspose(512, kernel_size=4, strides=2, padding="same"),
         layers.LeakyReLU(alpha=0.2),
         layers.Conv2D(3, kernel_size=5, padding="same", activation="sigmoid"),
     ],
@@ -86,7 +86,6 @@ class GAN(keras.Model):
             predictions = self.discriminator(combined_images)
             d_loss = self.loss_fn(labels, predictions)
         grads = tape.gradient(d_loss, self.discriminator.trainable_weights)
-        #grads = [(tf.clip_by_norm(grad, clip_norm=2.0)) for grad in grads]
         self.d_optimizer.apply_gradients(
             zip(grads, self.discriminator.trainable_weights)
         )
@@ -114,7 +113,7 @@ class GAN(keras.Model):
         }
 
 class GANMonitor(keras.callbacks.Callback):
-    def __init__(self, num_img=3, latent_dim=448):
+    def __init__(self, num_img=3, latent_dim=128):
         self.num_img = num_img
         self.latent_dim = latent_dim
 
