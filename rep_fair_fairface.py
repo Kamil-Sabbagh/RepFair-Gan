@@ -127,7 +127,7 @@ class GANMonitor(keras.callbacks.Callback):
             img = keras.preprocessing.image.array_to_img(generated_images[i])
             img.save("generated_imgs/generated_img_%03d_%d.png" % (epoch, i))
 
-epochs = 1  # In practice, use ~100 epochs
+epochs = 100  # In practice, use ~100 epochs
 
 gan = GAN(discriminator=discriminator, generator=generator, latent_dim=latent_dim)
 gan.compile(
