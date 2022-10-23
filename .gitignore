@@ -4,3 +4,5 @@ fairface-img-margin025-trainval.zip
 .git
 Miniconda3-latest-Linux-x86_64.sh
 val
+Generator_model
+Discriminator_model

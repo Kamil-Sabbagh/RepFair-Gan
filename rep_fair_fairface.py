@@ -3,7 +3,6 @@ from tensorflow import keras
 from tensorflow.keras import layers
 from keras.models import load_model
 
-
 dataset = keras.preprocessing.image_dataset_from_directory(
     "dataset/train/", label_mode=None, image_size=(64, 64), batch_size=64
 )
@@ -126,30 +125,14 @@ class GANMonitor(keras.callbacks.Callback):
         generated_images.numpy()
         for i in range(self.num_img):
             img = keras.preprocessing.image.array_to_img(generated_images[i])
-            img.save("generated_images/generated_img_%03d_%d.png" % (epoch+100, i))
+            img.save("generated_imgs/generated_img_%03d_%d.png" % (epoch+100, i))
+
+epochs = 100  # In practice, use ~100 epochs
 
 
+generator = load_model("Generator_model")
+discriminator = load_model("Discriminator_model")
 
-
-def save(gan, generator, discriminator):
-	discriminator.trainable = False
-	save_model(gan, 'gan')
-	discriminator.trainable = True
-	save_model(generator, 'generator')
-	save_model(discriminator, 'discriminator')
-
-def load():
-	discriminator = load_model('discriminator')
-	generator = load_model('generator')
-	gan = load_model('gan')
-	gan.summary()
-	discriminator.summary()
-	generator.summary()
-
-	return generator.summary()
-
-
-epochs = 1  # In practice, use ~100 epochs
 
 
 gan = GAN(discriminator=discriminator, generator=generator, latent_dim=latent_dim)
@@ -160,10 +143,9 @@ gan.compile(
 )
 
 gan.fit(
-    dataset, epochs=epochs, callbacks=[GANMonitor(num_img=3, latent_dim=latent_dim)]
+    dataset, epochs=epochs, callbacks=[GANMonitor(num_img=10, latent_dim=latent_dim)]
 )
 
-#gan.generator.save("Generator_model")
-#gan.discriminator.save("Discriminator_model")
+gan.generator.save("Generator_model")
+gan.discriminator.save("Discriminator_model")
 
-#save(gan, gan.generator, gan.discriminator)
