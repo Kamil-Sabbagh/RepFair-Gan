@@ -4,7 +4,7 @@ from tensorflow.keras import layers
 
 
 dataset = keras.preprocessing.image_dataset_from_directory(
-    "dataset/train/", label_mode=None, image_size=(64, 64), batch_size=1
+    "dataset/train/", label_mode=None, image_size=(64, 64), batch_size=64
 )
 dataset = dataset.map(lambda x: x / 255.0)
 
@@ -125,9 +125,9 @@ class GANMonitor(keras.callbacks.Callback):
         generated_images.numpy()
         for i in range(self.num_img):
             img = keras.preprocessing.image.array_to_img(generated_images[i])
-            img.save("generated_imgs/generated_img_%03d_%d.png" % (epoch, i))
+            img.save("generated_imgs_fair/generated_img_%03d_%d.png" % (epoch, i))
 
-epochs = 100 # In practice, use ~100 epochs
+epochs = 300 # In practice, use ~100 epochs
 
 gan = GAN(discriminator=discriminator, generator=generator, latent_dim=latent_dim)
 gan.compile(
@@ -140,5 +140,5 @@ gan.fit(
     dataset, epochs=epochs, callbacks=[GANMonitor(num_img=10, latent_dim=latent_dim)]
 )
 
-gan.generator.save("Generator_model")
-gan.discriminator.save("Discriminator_model")
+gan.generator.save("Generator_model_fair")
+gan.discriminator.save("Discriminator_model_fair")
