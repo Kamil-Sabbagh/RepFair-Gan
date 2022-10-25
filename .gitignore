@@ -8,5 +8,6 @@ Generator_model
 Discriminator_model
 nohup.out
 generated_imgs_fair
+generated_imgs
 Discriminator_model_fair
 Generator_model_fair
