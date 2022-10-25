@@ -7,3 +7,6 @@ val
 Generator_model
 Discriminator_model
 nohup.out
+generated_imgs_fair
+Discriminator_model_fair
+Generator_model_fair
